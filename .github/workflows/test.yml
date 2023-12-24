@@ -14,7 +14,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +26,9 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Build and Test with Gradle
         run: |
