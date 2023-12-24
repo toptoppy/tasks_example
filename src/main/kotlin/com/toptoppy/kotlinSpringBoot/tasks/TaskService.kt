@@ -5,8 +5,6 @@ import com.toptoppy.kotlinSpringBoot.tasks.error.GeneralException
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
-import java.util.*
 
 @Service
 class TaskService(
@@ -15,7 +13,7 @@ class TaskService(
     private val logger = KotlinLogging.logger {}
 
     fun createNewTask(task: TaskRequest): TaskEntity {
-        val dueDateInstant = DateTimeUtils.fromString(task.dueDate)
+        val dueDateInstant = DateTimeUtils.parseIso8601Utc(task.dueDate)
 
         return taskRepository.save(
             TaskEntity(
@@ -40,7 +38,7 @@ class TaskService(
                     id = taskId,
                     title = request.title,
                     description = request.description,
-                    dueDate = DateTimeUtils.fromString(request.dueDate),
+                    dueDate = DateTimeUtils.parseIso8601Utc(request.dueDate),
                     status = request.status.toString(),
                 )
             )

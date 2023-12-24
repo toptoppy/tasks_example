@@ -13,6 +13,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 
 @WebMvcTest
@@ -24,11 +26,13 @@ class TaskControllerTest(
     lateinit var taskService: TaskService
     val mapper = jacksonObjectMapper().findAndRegisterModules()
 
+    private val dueDateInstant = Instant.now().plus(30, ChronoUnit.DAYS)
+
     private val taskEntity = TaskEntity(
         1,
         "New Task",
         "New Description",
-        DateTimeUtils.fromString("2023-12-24T15:30:45Z"),
+        dueDateInstant,
         TaskStatus.PENDING.toString()
     )
 
@@ -36,7 +40,7 @@ class TaskControllerTest(
     inner class Post {
         @Test
         fun `should create a new task`() {
-            val newTask = TaskRequest("New Task", "New Description", "2024-11-24T15:30:45Z", TaskStatus.PENDING)
+            val newTask = TaskRequest("New Task", "New Description", "2122-01-01T12:00:00Z", TaskStatus.PENDING)
 
             val createdTask = taskEntity
 
@@ -103,7 +107,7 @@ class TaskControllerTest(
                 taskId,
                 "Updated Task",
                 "Updated Description",
-                DateTimeUtils.fromString("2023-12-25T12:00:00Z"),
+                DateTimeUtils.parseIso8601Utc("2023-12-25T12:00:00Z"),
                 TaskStatus.IN_PROGRESS.toString()
             )
 

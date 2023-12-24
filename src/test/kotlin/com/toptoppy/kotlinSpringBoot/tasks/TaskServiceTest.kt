@@ -26,18 +26,18 @@ class TaskServiceTest {
         @Test
         fun `when request task should create new task entity`() {
             // Given
-            val newTask = TaskRequest("New Task", "New Description", "2023-12-24T15:30:45Z", TaskStatus.PENDING)
+            val newTask = TaskRequest("New Task", "New Description", "2123-12-24T15:30:45Z", TaskStatus.PENDING)
             val task = TaskEntity(
                 title = "New Task",
                 description = "New Description",
-                dueDate = DateTimeUtils.fromString("2023-12-24T15:30:45Z"),
+                dueDate = DateTimeUtils.parseIso8601Utc("2123-12-24T15:30:45Z"),
                 status = TaskStatus.PENDING.toString()
             )
             val createdTask = TaskEntity(
                 id = 1,
                 title = "New Task",
                 description = "New Description",
-                dueDate = DateTimeUtils.fromString("2023-12-24T15:30:45Z"),
+                dueDate = DateTimeUtils.parseIso8601Utc("2123-12-24T15:30:45Z"),
                 status = TaskStatus.PENDING.toString()
             )
 
@@ -67,7 +67,7 @@ class TaskServiceTest {
         @Test
         fun `when saving task fails, should throw exception`() {
             // Given
-            val newTask = TaskRequest("New Task", "New Description", "2023-12-24T15:30:45Z", TaskStatus.PENDING)
+            val newTask = TaskRequest("New Task", "New Description", "2123-12-24T15:30:45Z", TaskStatus.PENDING)
 
             every { mockTaskRepository.save(any()) } throws RuntimeException("Failed to save task")
 
@@ -97,18 +97,18 @@ class TaskServiceTest {
         fun `when creating task with valid due date, should succeed`() {
             // Given
             val validDueDateTask =
-                TaskRequest("Valid Due Date", "Description", "2024-01-01T12:00:00Z", TaskStatus.PENDING)
+                TaskRequest("Valid Due Date", "Description", "2124-01-01T12:00:00Z", TaskStatus.PENDING)
             val task = TaskEntity(
                 title = "Valid Due Date",
                 description = "Description",
-                dueDate = Instant.parse("2024-01-01T12:00:00Z"),
+                dueDate = Instant.parse("2124-01-01T12:00:00Z"),
                 status = TaskStatus.PENDING.toString()
             )
             val createdTask = TaskEntity(
                 id = 1,
                 title = "Valid Due Date",
                 description = "Description",
-                dueDate = Instant.parse("2024-01-01T12:00:00Z"),
+                dueDate = Instant.parse("2124-01-01T12:00:00Z"),
                 status = TaskStatus.PENDING.toString()
             )
 
