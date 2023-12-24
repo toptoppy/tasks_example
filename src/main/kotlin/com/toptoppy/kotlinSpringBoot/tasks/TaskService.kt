@@ -8,12 +8,12 @@ class TaskService(
 ) {
 
     fun createNewTask(task: TaskRequest): TaskEntity {
-        val dueDateInstant = DateTimeUtils.parseIso8601Utc(task.date)
+        val dueDateInstant = DateTimeUtils.fromString(task.dueDate)
 
         return taskRepository.save(TaskEntity(
             title = task.title,
             description = task.description,
-            date = dueDateInstant,
+            dueDate = dueDateInstant,
             status = task.status.toString()
         ))
     }

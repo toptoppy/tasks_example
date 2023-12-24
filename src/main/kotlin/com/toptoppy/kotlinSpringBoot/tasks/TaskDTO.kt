@@ -3,7 +3,7 @@ package com.toptoppy.kotlinSpringBoot.tasks
 data class TaskRequest(
     var title: String,
     var description: String,
-    var date: String,
+    var dueDate: String,
     var status: TaskStatus,
 )
 

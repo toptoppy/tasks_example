@@ -29,7 +29,7 @@ This project serves as an introduction to Kotlin and Spring Boot, providing a ha
 
 ### Testing Best Practices
 
-- Unit testing with JUnit and Mockito
+- Unit testing with JUnit and Mockk
 - Integration testing for Spring Boot applications
 
 ## Getting Started
@@ -44,6 +44,11 @@ git clone https://github.com/toptoppy/tasks_example.git
 
 - Navigate through the project structure.
 - Review Kotlin classes and Spring Boot configurations.
+
+## Start Spring Boot
+
+- run docker compose `docker-compose -f docker-compose.yml up -d`
+- run local `./gradlew bootRun`
 
 ## Run Tests
 

@@ -12,7 +12,7 @@ data class TaskEntity (
     val id: Long? = 0,
     var title: String,
     var description: String,
-    var date: Instant,
+    var dueDate: Instant,
     var status: String,
     @CreationTimestamp
     @Column(updatable = false)

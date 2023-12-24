@@ -28,7 +28,7 @@ class TaskControllerTest(
             1,
             "New Task",
             "New Description",
-            DateTimeUtils.parseIso8601Utc("2023-12-24T15:30:45Z"),
+            DateTimeUtils.fromString("2023-12-24T15:30:45Z"),
             TaskStatus.PENDING.toString()
         )
 
@@ -42,22 +42,4 @@ class TaskControllerTest(
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.status").value("PENDING"));
     }
-
-//    @Test
-//    fun `should create a new task`() {
-//        // Given
-//        val newTask = TaskRequest("New Task", "New Description", "2023-12-24T15:30:45Z", TaskStatus.PENDING)
-//        val createdTask = TaskEntity(1, "New Task", "New Description", DateTimeUtils.parseIso8601Utc("2023-12-24T15:30:45Z"), TaskStatus.PENDING.toString())
-//        given(taskService.createNewTask(newTask)).willReturn(createdTask)
-//
-//        // When & Then
-//        mockMvc.perform(post("/tasks")
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .content(objectMapper.writeValueAsString(newTask)))
-//            .andExpect(status().isOk)
-//            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//            .andExpect(content().json(objectMapper.writeValueAsString(createdTask)))
-//
-//        verify(taskService, times(1)).createNewTask(newTask)
-//    }
 }
