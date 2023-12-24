@@ -25,13 +25,13 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	// for logger
-	implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
+	implementation("io.github.microutils:kotlin-logging-jvm")
 	implementation("ch.qos.logback:logback-classic")
 	// postgres driver
 	runtimeOnly("org.postgresql:postgresql")
 	// test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("com.ninja-squad:springmockk:3.1.2") // mockk
+	testImplementation("com.ninja-squad:springmockk") // mockk
 }
 
 tasks.withType<KotlinCompile> {
