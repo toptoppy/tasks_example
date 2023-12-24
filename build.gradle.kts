@@ -30,8 +30,8 @@ dependencies {
 	// postgres driver
 	runtimeOnly("org.postgresql:postgresql")
 
-//	implementation("com.h2database:h2")
 	// test
+	testImplementation("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.ninja-squad:springmockk:3.1.2") // mockk
 }
