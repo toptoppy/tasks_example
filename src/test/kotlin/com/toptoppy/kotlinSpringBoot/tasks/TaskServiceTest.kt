@@ -168,7 +168,6 @@ class TaskServiceTest {
         fun `when requesting task by ID and not found record should return null`() {
             // Given
             val taskId = 1L
-            val task = TaskEntity(taskId, "Task 1", "Description 1", Instant.now(), TaskStatus.PENDING.toString())
 
             every { mockTaskRepository.findByIdOrNull(taskId) } returns null
 
@@ -181,32 +180,86 @@ class TaskServiceTest {
         }
     }
 
-//    @Nested
-//    inner class UpdateTask {
-//        @Test
-//        fun `when updating task should return the updated task`() {
-//            // Given
-//            val taskId = 1L
-//            val existingTask = TaskEntity(taskId, "Task 1", "Description 1", Instant.now(), TaskStatus.PENDING.toString())
-//            val updatedTaskRequest = TaskRequest("Updated Task", "Updated Description", "2023-12-25T10:00:00Z", TaskStatus.IN_PROGRESS)
-//            val updatedTask = TaskEntity(
-//                id = taskId,
-//                title = "Updated Task",
-//                description = "Updated Description",
-//                dueDate = Instant.parse("2023-12-25T10:00:00Z"),
-//                status = TaskStatus.IN_PROGRESS.toString()
-//            )
-//
-//            every { mockTaskRepository.findById(taskId) } returns existingTask
-//            every { mockTaskRepository.save(any()) } returns updatedTask
-//
-//            // When
-//            val result = taskService.updateTask(taskId, updatedTaskRequest)
-//
-//            // Then
-//            verify(exactly = 1) { mockTaskRepository.findById(taskId) }
-//            verify(exactly = 1) { mockTaskRepository.save(any()) }
-//            assertEquals(updatedTask, result)
-//        }
-//    }
+    @Nested
+    inner class UpdateTask {
+
+        @Test
+        fun `when updating task should return null if record not exists`() {
+            // Given
+            val taskId = 1L
+            val updatedTaskRequest =
+                TaskRequest("Updated Task", "Updated Description", "2023-12-25T10:00:00Z", TaskStatus.IN_PROGRESS)
+
+            every { mockTaskRepository.existsById(taskId) } returns false
+
+            // When
+            val result = taskService.updateTask(taskId, updatedTaskRequest)
+
+            // Then
+            verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
+            verify(exactly = 0) { mockTaskRepository.save(any()) }
+            assertNull(result)
+        }
+
+        @Test
+        fun `when updating task should return the updated task`() {
+            // Given
+            val taskId = 1L
+            val updatedTaskRequest =
+                TaskRequest("Updated Task", "Updated Description", "2023-12-25T10:00:00Z", TaskStatus.IN_PROGRESS)
+            val updatedTask = TaskEntity(
+                id = taskId,
+                title = "Updated Task",
+                description = "Updated Description",
+                dueDate = Instant.parse("2023-12-25T10:00:00Z"),
+                status = TaskStatus.IN_PROGRESS.toString()
+            )
+
+            every { mockTaskRepository.existsById(taskId) } returns true
+            every { mockTaskRepository.save(any()) } returns updatedTask
+
+            // When
+            val result = taskService.updateTask(taskId, updatedTaskRequest)
+
+            // Then
+            verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
+            verify(exactly = 1) { mockTaskRepository.save(any()) }
+            assertEquals(updatedTask, result)
+        }
+    }
+
+    @Nested
+    inner class DeleteTask {
+
+        @Test
+        fun `when removing task should return null if record not exists`() {
+            // Given
+            val taskId = 1L
+
+            every { mockTaskRepository.existsById(taskId) } returns false
+
+            // When
+            taskService.deleteTask(taskId)
+
+            // Then
+            verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
+            verify(exactly = 0) { mockTaskRepository.deleteById(any()) }
+        }
+
+        @Test
+        fun `when removing task should return the removed task`() {
+// Given
+            val taskId = 1L
+
+            every { mockTaskRepository.existsById(taskId) } returns true
+            every { mockTaskRepository.deleteById(taskId) } returns Unit
+
+            // When
+            taskService.deleteTask(taskId)
+
+            // Then
+            verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
+            verify(exactly = 1) { mockTaskRepository.deleteById(any()) }
+        }
+    }
 }
