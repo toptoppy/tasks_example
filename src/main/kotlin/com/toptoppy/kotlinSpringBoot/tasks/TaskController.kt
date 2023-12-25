@@ -1,5 +1,9 @@
 package com.toptoppy.kotlinSpringBoot.tasks
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "TASKS", description = "the Tasks Api") // this for modified swagger
 @RestController
 @RequestMapping("/tasks")
 class TaskController(private val taskService: TaskService) {
@@ -21,6 +26,12 @@ class TaskController(private val taskService: TaskService) {
         return ResponseEntity(createdTask, HttpStatus.CREATED)
     }
 
+    @Operation(
+        summary = "Fetch all task",
+        description = "fetches all task entities and their data from data source")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "successful operation")
+        ])
     @GetMapping
     fun getAllTasks(): ResponseEntity<List<TaskEntity>> {
         val tasks = taskService.getAllTasks()
