@@ -1,5 +1,10 @@
 package com.toptoppy.kotlinSpringBoot.tasks
 
+import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskRequest
+import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskResponse
+import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskStatus
+import com.toptoppy.kotlinSpringBoot.tasks.error.GeneralException
+import com.toptoppy.kotlinSpringBoot.tasks.utils.DateTimeUtils
 import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -33,28 +38,28 @@ class TaskServiceTest {
                 dueDate = DateTimeUtils.parseIso8601Utc("2123-12-24T15:30:45Z"),
                 status = TaskStatus.PENDING.toString()
             )
-            val createdTask = TaskEntity(
-                id = 1,
+            val createdTaskResponse = TaskResponse(
+                id = 0,
                 title = "New Task",
                 description = "New Description",
                 dueDate = DateTimeUtils.parseIso8601Utc("2123-12-24T15:30:45Z"),
                 status = TaskStatus.PENDING.toString()
             )
 
-            every { mockTaskRepository.save(task) } returns createdTask
+            every { mockTaskRepository.save(task) } returns task
 
             // When
             val result = taskService.createNewTask(newTask)
 
             // Then
             verify(exactly = 1) { mockTaskRepository.save(task) }
-            assertEquals(createdTask, result)
+            assertEquals(createdTaskResponse, result)
         }
 
         @Test
         fun `when request task with invalid date format should throw exception`() {
             // Given
-            val invalidDateFormatTask = TaskRequest("Invalid Date", "Description", "2023-12-24", TaskStatus.PENDING)
+            val invalidDateFormatTask = TaskRequest("Invalid Date", "Description", "2123-12-24", TaskStatus.PENDING)
 
             // When/Then
             assertThrows<DateTimeParseException> {
@@ -69,10 +74,10 @@ class TaskServiceTest {
             // Given
             val newTask = TaskRequest("New Task", "New Description", "2123-12-24T15:30:45Z", TaskStatus.PENDING)
 
-            every { mockTaskRepository.save(any()) } throws RuntimeException("Failed to save task")
+            every { mockTaskRepository.save(any()) } throws Exception("INTERNAL_SERVER_ERROR")
 
             // When/Then
-            assertThrows<RuntimeException> {
+            assertThrows<GeneralException> {
                 taskService.createNewTask(newTask)
             }
 
@@ -104,15 +109,15 @@ class TaskServiceTest {
                 dueDate = Instant.parse("2124-01-01T12:00:00Z"),
                 status = TaskStatus.PENDING.toString()
             )
-            val createdTask = TaskEntity(
-                id = 1,
+            val createdTask = TaskResponse(
+                id = 0,
                 title = "Valid Due Date",
                 description = "Description",
                 dueDate = Instant.parse("2124-01-01T12:00:00Z"),
                 status = TaskStatus.PENDING.toString()
             )
 
-            every { mockTaskRepository.save(task) } returns createdTask
+            every { mockTaskRepository.save(task) } returns task
 
             // When
             val result = taskService.createNewTask(validDueDateTask)
@@ -130,10 +135,17 @@ class TaskServiceTest {
         @Test
         fun `when requesting all tasks should return list of tasks`() {
             // Given
-            val task1 = TaskEntity(1, "Task 1", "Description 1", Instant.now(), TaskStatus.PENDING.toString())
-            val task2 = TaskEntity(2, "Task 2", "Description 2", Instant.now(), TaskStatus.IN_PROGRESS.toString())
-            val task3 = TaskEntity(3, "Task 3", "Description 3", Instant.now(), TaskStatus.COMPLETED.toString())
+            val dueDateFix = Instant.parse("2123-12-25T10:00:00Z")
+
+            val task1 = TaskEntity(1, "Task 1", "Description 1", dueDateFix, TaskStatus.PENDING.toString())
+            val task2 = TaskEntity(2, "Task 2", "Description 2", dueDateFix, TaskStatus.IN_PROGRESS.toString())
+            val task3 = TaskEntity(3, "Task 3", "Description 3", dueDateFix, TaskStatus.COMPLETED.toString())
+
+            val taskRes1 = TaskResponse(1, "Task 1", "Description 1", dueDateFix, TaskStatus.PENDING.toString())
+            val taskRes2 = TaskResponse(2, "Task 2", "Description 2", dueDateFix, TaskStatus.IN_PROGRESS.toString())
+            val taskRes3 = TaskResponse(3, "Task 3", "Description 3", dueDateFix, TaskStatus.COMPLETED.toString())
             val tasks = listOf(task1, task2, task3)
+            val taskRes = listOf(taskRes1,taskRes2,taskRes3)
 
             every { mockTaskRepository.findAll() } returns tasks
 
@@ -142,7 +154,7 @@ class TaskServiceTest {
 
             // Then
             verify(exactly = 1) { mockTaskRepository.findAll() }
-            assertEquals(tasks, result)
+            assertEquals(taskRes, result)
         }
     }
 
@@ -151,8 +163,10 @@ class TaskServiceTest {
         @Test
         fun `when requesting task by ID should return the task`() {
             // Given
+            val dueDateFix = Instant.parse("2123-12-25T10:00:00Z")
             val taskId = 1L
-            val task = TaskEntity(taskId, "Task 1", "Description 1", Instant.now(), TaskStatus.PENDING.toString())
+            val task = TaskEntity(taskId, "Task 1", "Description 1", dueDateFix, TaskStatus.PENDING.toString())
+            val taskRes = TaskResponse(1, "Task 1", "Description 1", dueDateFix, TaskStatus.PENDING.toString())
 
             every { mockTaskRepository.findByIdOrNull(taskId) } returns task
 
@@ -161,7 +175,7 @@ class TaskServiceTest {
 
             // Then
             verify(exactly = 1) { mockTaskRepository.findById(taskId) }
-            assertEquals(task, result)
+            assertEquals(taskRes, result)
         }
 
         @Test
@@ -190,13 +204,13 @@ class TaskServiceTest {
             val updatedTaskRequest =
                 TaskRequest("Updated Task", "Updated Description", "2023-12-25T10:00:00Z", TaskStatus.IN_PROGRESS)
 
-            every { mockTaskRepository.existsById(taskId) } returns false
+            every { mockTaskRepository.findByIdOrNull(taskId) } returns null
 
             // When
             val result = taskService.updateTask(taskId, updatedTaskRequest)
 
             // Then
-            verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
+            verify(exactly = 1) { mockTaskRepository.findByIdOrNull(taskId) }
             verify(exactly = 0) { mockTaskRepository.save(any()) }
             assertNull(result)
         }
@@ -206,23 +220,37 @@ class TaskServiceTest {
             // Given
             val taskId = 1L
             val updatedTaskRequest =
-                TaskRequest("Updated Task", "Updated Description", "2023-12-25T10:00:00Z", TaskStatus.IN_PROGRESS)
-            val updatedTask = TaskEntity(
+                TaskRequest("Updated Task", "Updated Description", "2123-12-25T10:00:00Z", TaskStatus.IN_PROGRESS)
+            val entity = TaskEntity(
                 id = taskId,
                 title = "Updated Task",
                 description = "Updated Description",
-                dueDate = Instant.parse("2023-12-25T10:00:00Z"),
+                dueDate = Instant.parse("2123-12-25T10:00:00Z"),
+                status = TaskStatus.PENDING.toString()
+            )
+            val updateEntity = TaskEntity(
+                id = taskId,
+                title = "Updated Task",
+                description = "Updated Description",
+                dueDate = Instant.parse("2123-12-25T10:00:00Z"),
+                status = TaskStatus.IN_PROGRESS.toString()
+            )
+            val updatedTask = TaskResponse(
+                id = 1,
+                title = "Updated Task",
+                description = "Updated Description",
+                dueDate = Instant.parse("2123-12-25T10:00:00Z"),
                 status = TaskStatus.IN_PROGRESS.toString()
             )
 
-            every { mockTaskRepository.existsById(taskId) } returns true
-            every { mockTaskRepository.save(any()) } returns updatedTask
+            every { mockTaskRepository.findByIdOrNull(taskId) } returns entity
+            every { mockTaskRepository.save(updateEntity) } returns updateEntity
 
             // When
             val result = taskService.updateTask(taskId, updatedTaskRequest)
 
             // Then
-            verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
+            verify(exactly = 1) { mockTaskRepository.findByIdOrNull(taskId) }
             verify(exactly = 1) { mockTaskRepository.save(any()) }
             assertEquals(updatedTask, result)
         }
@@ -239,7 +267,7 @@ class TaskServiceTest {
             every { mockTaskRepository.existsById(taskId) } returns false
 
             // When
-            taskService.deleteTask(taskId)
+            assertThrows<GeneralException> { taskService.deleteTask(taskId) }
 
             // Then
             verify(exactly = 1) { mockTaskRepository.existsById(taskId) }
@@ -248,7 +276,7 @@ class TaskServiceTest {
 
         @Test
         fun `when removing task should return the removed task`() {
-// Given
+            // Given
             val taskId = 1L
 
             every { mockTaskRepository.existsById(taskId) } returns true

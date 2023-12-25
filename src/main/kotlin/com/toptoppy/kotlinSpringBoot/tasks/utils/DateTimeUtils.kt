@@ -1,4 +1,4 @@
-package com.toptoppy.kotlinSpringBoot.tasks
+package com.toptoppy.kotlinSpringBoot.tasks.utils
 
 import com.toptoppy.kotlinSpringBoot.tasks.error.GeneralException
 import java.time.Instant

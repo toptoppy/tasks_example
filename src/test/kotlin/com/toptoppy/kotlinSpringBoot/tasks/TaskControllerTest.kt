@@ -2,8 +2,12 @@ package com.toptoppy.kotlinSpringBoot.tasks
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskRequest
+import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskResponse
+import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskStatus
 import com.toptoppy.kotlinSpringBoot.tasks.error.ErrorCode
 import com.toptoppy.kotlinSpringBoot.tasks.error.GeneralException
+import com.toptoppy.kotlinSpringBoot.tasks.utils.DateTimeUtils
 import io.mockk.every
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -28,7 +32,7 @@ class TaskControllerTest(
 
     private val dueDateInstant = Instant.now().plus(30, ChronoUnit.DAYS)
 
-    private val taskEntity = TaskEntity(
+    private val taskEntity = TaskResponse(
         1,
         "New Task",
         "New Description",
@@ -102,12 +106,12 @@ class TaskControllerTest(
         @Test
         fun `should update an existing task`() {
             val taskId = 1L
-            val updatedTaskRequest = TaskRequest("Updated Task", "Updated Description", "2023-12-25T12:00:00Z", TaskStatus.IN_PROGRESS)
-            val updatedTaskEntity = TaskEntity(
+            val updatedTaskRequest = TaskRequest("Updated Task", "Updated Description", "2123-12-25T12:00:00Z", TaskStatus.IN_PROGRESS)
+            val updatedTaskEntity = TaskResponse(
                 taskId,
                 "Updated Task",
                 "Updated Description",
-                DateTimeUtils.parseIso8601Utc("2023-12-25T12:00:00Z"),
+                DateTimeUtils.parseIso8601Utc("2123-12-25T12:00:00Z"),
                 TaskStatus.IN_PROGRESS.toString()
             )
 
@@ -164,5 +168,16 @@ class TaskControllerTest(
             )
                 .andExpect(status().is4xxClientError) //TODO: should expect 404 NOT FOUND
         }
+    }
+
+    @Test
+    fun `should return bad request for invalid JSON`() {
+        val invalidJson = "{ invalid json }"
+
+        mockMvc.perform(
+            post("/tasks").content(invalidJson)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isBadRequest)
     }
 }

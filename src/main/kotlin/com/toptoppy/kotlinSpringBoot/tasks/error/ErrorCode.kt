@@ -3,4 +3,5 @@ package com.toptoppy.kotlinSpringBoot.tasks.error
 enum class ErrorCode(val errorMessage: String){
     VALIDATION_ERROR("Validation error"),
     TASK_NOT_FOUND("Task not found"),
+    INTERNAL_SERVER_ERROR("Internal server error"),
 }

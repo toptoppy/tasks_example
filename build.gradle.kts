@@ -31,9 +31,8 @@ dependencies {
 	implementation("ch.qos.logback:logback-classic:1.4.7")
 	// postgres driver
 	runtimeOnly("org.postgresql:postgresql:42.5.4")
-
 	// test
-//	testImplementation("com.h2database:h2")
+	testImplementation("com.h2database:h2:2.1.214")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.0")
 	testImplementation("com.ninja-squad:springmockk:4.0.2") // mockk
 }

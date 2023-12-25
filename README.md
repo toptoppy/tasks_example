@@ -8,6 +8,7 @@ This repository is a comprehensive guide to Kotlin and Spring Boot, designed to 
 - **Framework:** Spring Boot
 - **Level:** 101 (Beginner-friendly)
 - **Testing:** Comprehensive test suite included
+- **Swagger:** API docs
 
 ## Project Overview
 
@@ -49,6 +50,7 @@ git clone https://github.com/toptoppy/tasks_example.git
 
 - run docker compose `docker-compose -f docker-compose.yml up -d`
 - run local `./gradlew bootRun`
+- [swagger](https://springdoc.org/#general-overview) path `http://localhost:8080/swagger-ui/index.html`
 
 ## Run Tests
 
