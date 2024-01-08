@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/tasks")
 class TaskController(private val taskService: TaskService) {
-
     @Operation(
         summary = "Fetch all tasks",
         description = "Fetches all task entities and their data from the data source"
@@ -48,6 +48,15 @@ class TaskController(private val taskService: TaskService) {
     @PutMapping("/{taskId}")
     fun updateTask(@PathVariable taskId: Long, @RequestBody request: TaskRequest): ResponseEntity<TaskResponse?> {
         val updatedTask = taskService.updateTask(taskId, request)
+        return updatedTask?.let { ResponseEntity.ok(it) } ?: ResponseEntity.notFound().build()
+    }
+
+    @PatchMapping("/{taskId}")
+    fun partialUpdateTask(
+        @PathVariable taskId: Long,
+        @RequestBody request: Map<String, Any>
+    ): ResponseEntity<TaskResponse?> {
+        val updatedTask = taskService.partialUpdateTask(taskId, request)
         return updatedTask?.let { ResponseEntity.ok(it) } ?: ResponseEntity.notFound().build()
     }
 
