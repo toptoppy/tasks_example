@@ -1,7 +1,8 @@
-package com.toptoppy.kotlinSpringBoot.tasks
+package com.toptoppy.kotlinSpringBoot.tasks.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import com.toptoppy.kotlinSpringBoot.tasks.TaskService
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskRequest
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskResponse
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskStatus

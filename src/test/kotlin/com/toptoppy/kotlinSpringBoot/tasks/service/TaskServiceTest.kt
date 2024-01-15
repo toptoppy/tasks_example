@@ -1,5 +1,8 @@
-package com.toptoppy.kotlinSpringBoot.tasks
+package com.toptoppy.kotlinSpringBoot.tasks.service
 
+import com.toptoppy.kotlinSpringBoot.tasks.TaskEntity
+import com.toptoppy.kotlinSpringBoot.tasks.TaskRepository
+import com.toptoppy.kotlinSpringBoot.tasks.TaskService
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskRequest
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskResponse
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskStatus

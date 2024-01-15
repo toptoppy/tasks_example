@@ -1,6 +1,8 @@
-package com.toptoppy.kotlinSpringBoot.tasks
+package com.toptoppy.kotlinSpringBoot.tasks.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.toptoppy.kotlinSpringBoot.tasks.TaskEntity
+import com.toptoppy.kotlinSpringBoot.tasks.TaskRepository
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskRequest
 import com.toptoppy.kotlinSpringBoot.tasks.dto.TaskStatus
 import org.junit.jupiter.api.BeforeAll
